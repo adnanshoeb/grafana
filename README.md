@@ -32,10 +32,7 @@ prometheus-grafana-alert-migration/
 ├── rules/
 │   ├── rules.yaml
 │   └── mimirtool-rules.yaml
-├── docs/
-│   ├── migration-guide.md
-│   └── troubleshooting.md
-├── .gitignore
+
 ```
 
 ---
@@ -47,46 +44,14 @@ prometheus-grafana-alert-migration/
 Export all PrometheusRule resources from your namespace (e.g. `observability`) into a file:
 
 ```bash
-kubectl get prometheusrules -n observability -o yaml > rules/rules.yaml
+kubectl get prometheusrules -n <your-namespace> -o yaml > rules/rules.yaml
 ```
 
 ---
 
 ###  Step 2: Convert to `mimirtool` Format
 
-Create the script at `scripts/convert_to_mimir.py`:
-
-```python
-import yaml
-
-with open("rules/rules.yaml") as f:
-    k8s_rules = yaml.safe_load(f)
-
-all_groups = []
-items = k8s_rules.get("items", [])
-if not items and k8s_rules.get("kind") == "PrometheusRule":
-    items = [k8s_rules]
-
-for item in items:
-    spec = item.get("spec", {})
-    groups = spec.get("groups", [])
-    for group in groups:
-        group_entry = {
-            "name": group["name"],
-            "rules": group["rules"]
-        }
-        if "interval" in group:
-            group_entry["interval"] = group["interval"]
-        all_groups.append(group_entry)
-
-output = {
-    "namespace": "observability",
-    "groups": all_groups
-}
-
-with open("rules/mimirtool-rules.yaml", "w") as out:
-    yaml.dump(output, out, sort_keys=False, default_flow_style=False)
-```
+Download the script at `scripts/convert_to_mimir.py`:
 
 Run the script:
 
@@ -124,13 +89,15 @@ helm upgrade --install grafana grafana/grafana -f values.yaml
 
 ###  Step 4: Import Rules Using `mimirtool`
 
-1. **Get the UID** of your Prometheus data source from Grafana:  
-   Go to: `Configuration > Data Sources > Prometheus > UID`
+1. **Get the UID** of your Prometheus data source from Grafana.:  
+   Go to Configuration → Data Sources
+   Select your Prometheus data source (make sure it's not Alertmanager)
+   The UID will be visible in the browser’s address bar as part of the URL or under the Settings section. Example: https://<your-grafana-domain>/connections/datasources/edit/<DATASOURCE_UID>
 
-2. **Create an API Key** with `Alerting:Write` permission:  
+3. **Create an API Key** with `Alerting:Write` permission:  
    Go to: `Administration > API Keys > Create Key`
 
-3. **Import rules**:
+4. **Import rules**:
 
 ```bash
 mimirtool rules load rules/mimirtool-rules.yaml   --address https://<your-grafana>/api/convert/   --id 1   --extra-headers "Authorization=Bearer <YOUR_GRAFANA_API_KEY>"   --extra-headers "X-Grafana-Alerting-Datasource-UID=<PROMETHEUS_UID>"
