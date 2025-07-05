@@ -39,7 +39,7 @@ prometheus-grafana-alert-migration/
 
 ##  Step-by-Step Migration Guide
 
-###  Step 1: Export PrometheusRule Resources
+###  Step 1: Export PrometheusRule Resources.
 
 Export all PrometheusRule resources from your namespace (e.g. `observability`) into a file:
 
@@ -49,7 +49,7 @@ kubectl get prometheusrules -n <your-namespace> -o yaml > rules/rules.yaml
 
 ---
 
-###  Step 2: Convert to `mimirtool` Format
+###  Step 2: Convert to `mimirtool` Format.
 
 Download the script at `scripts/convert_to_mimir.py`:
 
@@ -62,6 +62,8 @@ python3 scripts/convert_to_mimir.py
 This generates `rules/mimirtool-rules.yaml`.
 
 ---
+🟡 Skip Step 1 & 2 if you already have a valid mimirtool-rules.yaml file in the rules/ directory.
+You can directly proceed to importing the rules into Grafana using the steps below.
 
 ###  Step 3: Enable Grafana Feature Flags
 
@@ -162,8 +164,8 @@ mimirtool rules sync rules/mimirtool-rules.yaml
 
 ---
 
-## 🔗 References
+## References
 
-- 📘 [Grafana Alerting Documentation](https://grafana.com/docs/grafana/latest/alerting/)
-- 📙 [Alerting Migration Guide](https://grafana.com/docs/grafana/latest/alerting/alerting-rules/alerting-migration/)
-- 🛠️ [mimirtool CLI Docs](https://grafana.com/docs/mimir/latest/operators-guide/mimirtool/)
+- [Grafana Alerting Documentation](https://grafana.com/docs/grafana/latest/alerting/)
+- [Alerting Migration Guide](https://grafana.com/docs/grafana/latest/alerting/alerting-rules/alerting-migration/)
+- [mimirtool CLI Docs](https://grafana.com/docs/mimir/latest/operators-guide/mimirtool/)
