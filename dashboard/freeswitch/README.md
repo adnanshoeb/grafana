@@ -30,9 +30,3 @@ The `FreeSWITCH Monitoring` dashboard (`freeswitch-monitoring-v3.json`) visualiz
 - **Grafana**: Version 10.0 or higher (compatible with schema version 41)
 - **Prometheus**: Configured as a datasource in Grafana
 - **freeswitch_exporter**: Running and exposing metrics to Prometheus (see [freeswitch_exporter setup](#freeswitch-exporter-setup))
-
-### Steps
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/project/freeswitch_exporter.git
-   cd freeswitch_exporter/dashboards
